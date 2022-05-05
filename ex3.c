@@ -16,6 +16,6 @@
 
 int main(int argc, char* argv[])
 {
-    printf("Test");
+    printf("Test2");
     return 0;
 }
