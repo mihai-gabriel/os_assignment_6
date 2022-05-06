@@ -42,7 +42,7 @@ int find_maximum(const int* numbers, const int N) {
 int main(int argc, char* argv[]) {
     int N = atoi(argv[1]);
     int k = atoi(argv[2]);
-    int minimum = 0, maximum = 0, l = 0, p = 0, status;
+    int minimum_index = 0, maximum_index = 0, l = 0, p = 0, status;
 
     // Allocating memory
     int* numbers = (int *) malloc(N * sizeof(int));
@@ -72,14 +72,14 @@ int main(int argc, char* argv[]) {
     if (max_pid == -1) {
         perror("fork() error: ");
         exit(EXIT_FAILURE);
-    } else {
+    } else if (max_pid == 0) {
         maximum_index = find_maximum(numbers, N);
-        printf("[MAX] %d\n", maximum_index);
+        printf("[MAX] %d\n", numbers[maximum_index]);
         exit(maximum_index);
     }
 
     wait(&status);
-    maximum = WEXITSTATUS(status);
+    maximum_index = WEXITSTATUS(status);
 
     for (p = 0; p < k; p++) {
         int min_pid = fork();
@@ -87,9 +87,9 @@ int main(int argc, char* argv[]) {
         if (min_pid == -1) {
             perror("fork() error: ");
             exit(EXIT_FAILURE);
-        } else {
+        } else if (min_pid == 0) {
             minimum_index = find_minimum(numbers, N);
-            printf("[MIN] %d\n", minimum_index);
+            printf("[MIN] %d\n", numbers[minimum_index]);
             exit(minimum_index);
         }
 
@@ -97,13 +97,14 @@ int main(int argc, char* argv[]) {
         minimum_index = WEXITSTATUS(status);
 
         if (p == k - 1) {
-            printf("Al %d-lea nr este: %d", k, minimum);
+            printf("Al %d-lea nr este: %d\n", k, numbers[minimum_index]);
         }
 
-        numbers[minimum_index] = maximum;
+        numbers[minimum_index] = numbers[maximum_index];
     }
     
     // cleanup
+    printf("\n");
     free(numbers);
     return 0;
 }
