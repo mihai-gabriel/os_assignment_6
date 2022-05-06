@@ -7,54 +7,102 @@
 /// adecvat de procese pentru rezolvarea cerintei. In rezolvarea
 /// problemei, NU se va folosi sortarea in prealabil a sirului.
 
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <unistd.h>
 #include <limits.h>
 
-int find_minimum(int* numbers, int N) {
-    int min = INT_MAX;
-    for (int i = 0; i < N; i++) {
-        if (numbers[i] < min) min = numbers[i];    
+int find_minimum(const int* numbers, const int N) {
+    int i = 0, index = 0, min = INT_MAX;
+    for (i = 0; i < N; i++) {
+        if (numbers[i] < min) {
+            min = numbers[i];
+            index = i;
+        }
     }
 
-    return min;
+    return index;
+}
+
+int find_maximum(const int* numbers, const int N) {
+    int i = 0, index = 0, max = INT_MIN;
+    for (i = 0; i < N; i++) {
+        if (numbers[i] > max) {
+            max = numbers[i];
+            index = i;
+        }    
+    }
+
+    return index;
 }
 
 int main(int argc, char* argv[]) {
-    int N = argv[1];
-    int k = argv[2];
+    int N = atoi(argv[1]);
+    int k = atoi(argv[2]);
+    int minimum = 0, maximum = 0, l = 0, p = 0, status;
 
+    // Allocating memory
     int* numbers = (int *) malloc(N * sizeof(int));
-    int minimum = 0, maximum = 0, status;
 
-    // File handling
-    FILE* input_file = fopen("file.txt", 'r');
+    if (numbers == NULL) {
+        perror("malloc failed: ");
+        exit(EXIT_FAILURE);
+    }
 
-    for (int l = 0; l < N; l++) {
-        fscanf(input_file, "%d", &numbers[l])
+    // Read numbers from file
+    FILE* input_file = fopen("file.txt", "r");
+
+    if (input_file == NULL) {
+        perror("file opening failed: ");
+        exit(EXIT_FAILURE);
+    }
+
+    for (l = 0; l < N; l++) {
+        fscanf(input_file, "%d", &numbers[l]);
     }
 
     fclose(input_file);
 
-    // processes handling
-    int pid = fork();
-    switch (pid)
-    {
-        case -1:
-            perror("fork() error: ");
-            exit(EXIT_FAILURE);
+    // Getting minimum / maximum from array
+    int max_pid = fork();
 
-        case 0:
-            minimum = find_minimum(numbers, N));            
-            exit(EXIT_SUCCESS);
-
-        default:
-            wait(&status);
-            printf("[PARENT] %d\n", minimum);
+    if (max_pid == -1) {
+        perror("fork() error: ");
+        exit(EXIT_FAILURE);
+    } else {
+        maximum_index = find_maximum(numbers, N);
+        printf("[MAX] %d\n", maximum_index);
+        exit(maximum_index);
     }
 
+    wait(&status);
+    maximum = WEXITSTATUS(status);
+
+    for (p = 0; p < k; p++) {
+        int min_pid = fork();
+
+        if (min_pid == -1) {
+            perror("fork() error: ");
+            exit(EXIT_FAILURE);
+        } else {
+            minimum_index = find_minimum(numbers, N);
+            printf("[MIN] %d\n", minimum_index);
+            exit(minimum_index);
+        }
+
+        wait(&status);
+        minimum_index = WEXITSTATUS(status);
+
+        if (p == k - 1) {
+            printf("Al %d-lea nr este: %d", k, minimum);
+        }
+
+        numbers[minimum_index] = maximum;
+    }
+    
     // cleanup
     free(numbers);
     return 0;
