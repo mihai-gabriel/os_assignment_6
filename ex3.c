@@ -47,9 +47,14 @@ int main(int argc, char* argv[]) {
 
     int N = atoi(argv[1]);
     int k = atoi(argv[2]);
-    int minimum_index = 0, maximum_index = 0, l = 0, p = 0, status;
+
+    if (N < k) {
+        printf("N must be bigger than or equal to k\n");
+        return EXIT_FAILURE;
+    }
 
     // Allocating memory
+    int minimum_index = 0, maximum_index = 0, l = 0, p = 0, status;
     int* numbers = (int *) malloc(N * sizeof(int));
 
     if (numbers == NULL) {
@@ -106,7 +111,7 @@ int main(int argc, char* argv[]) {
         minimum_index = WEXITSTATUS(status);
 
         if (p == k - 1) {
-            printf("Al %d-lea nr este: %d\n", k, numbers[minimum_index]);
+            printf("%dth number: %d\n", k, numbers[minimum_index]);
         }
 
         numbers[minimum_index] = numbers[maximum_index];
