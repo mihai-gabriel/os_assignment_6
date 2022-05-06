@@ -40,6 +40,11 @@ int find_maximum(const int* numbers, const int N) {
 }
 
 int main(int argc, char* argv[]) {
+    if (argc < 3) {
+        printf("Use: %s <N> <k>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
     int N = atoi(argv[1]);
     int k = atoi(argv[2]);
     int minimum_index = 0, maximum_index = 0, l = 0, p = 0, status;
@@ -61,13 +66,14 @@ int main(int argc, char* argv[]) {
     }
 
     printf("Array: [");
+
     for (l = 0; l < N; l++) {
         fscanf(input_file, "%d", &numbers[l]);
         printf("%d", numbers[l]);
         if (l != N - 1) printf(", ");
     }
 
-    fclose(input_file);
+    printf("]\n");
 
     // Getting minimum / maximum from array
     int max_pid = fork();
@@ -108,6 +114,7 @@ int main(int argc, char* argv[]) {
     
     // cleanup
     printf("\n");
+    fclose(input_file);
     free(numbers);
     return 0;
 }
