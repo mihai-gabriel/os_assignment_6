@@ -60,8 +60,11 @@ int main(int argc, char* argv[]) {
         exit(EXIT_FAILURE);
     }
 
+    printf("Array: [");
     for (l = 0; l < N; l++) {
         fscanf(input_file, "%d", &numbers[l]);
+        printf("%d", numbers[l]);
+        if (l != N - 1) printf(", ");
     }
 
     fclose(input_file);
